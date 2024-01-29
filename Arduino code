@@ -1,0 +1,48 @@
+const int micPin = A0;
+const unsigned long sampleInterval = 10;
+const int envelopeInterval = 500;  // Adjusted to check every 0.5 seconds
+const float alpha = 0.2;  // Low-pass filter smoothing factor for envelope
+
+unsigned long previousSampleTime = 0;
+unsigned long previousEnvelopeTime = 0;
+float filteredMicValue = 0.0;
+float envelope = 0.0;
+float threshold = 358.0;  // Adjusted threshold value
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(micPin, INPUT);
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+
+  // Sample audio signal
+  if (currentMillis - previousSampleTime >= sampleInterval) {
+    previousSampleTime = currentMillis;
+
+    int micValue = analogRead(micPin);
+
+    // Apply low-pass filter to smooth out the mic value
+    filteredMicValue = alpha * micValue + (1 - alpha) * filteredMicValue;
+
+    // Calculate envelope using absolute value
+    envelope = alpha * abs(filteredMicValue) + (1 - alpha) * envelope;
+  }
+
+  // Update result periodically
+  if (currentMillis - previousEnvelopeTime >= envelopeInterval) {
+    previousEnvelopeTime = currentMillis;
+
+    // Print envelope value for debugging
+    Serial.print("Envelope: ");
+    Serial.println(envelope);
+
+    // Determine if someone is speaking based on the envelope
+    if (envelope > threshold) {
+      Serial.println("Presence has been detected");
+    } else {
+      Serial.println("No presence detected");
+    }
+  }
+}
