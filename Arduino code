@@ -1,7 +1,7 @@
 const int micPin = A0;
 const unsigned long sampleInterval = 10;
 const int envelopeInterval = 500;  // Adjusted to check every 0.5 seconds
-const float alpha = 0.2;  // Low-pass filter smoothing factor for envelope
+const float alpha = 0.8;  // Low-pass filter smoothing factor for envelope
 
 unsigned long previousSampleTime = 0;
 unsigned long previousEnvelopeTime = 0;
